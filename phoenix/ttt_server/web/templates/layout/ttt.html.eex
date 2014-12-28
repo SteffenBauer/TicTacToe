@@ -1,0 +1,9 @@
+<html>
+  <head>
+    <title>TicTacToe</title>
+  </head>
+  <body>
+    <pre><%= @inner %></pre>
+  </body>
+</html>
+
