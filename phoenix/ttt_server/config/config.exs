@@ -8,8 +8,7 @@ use Mix.Config
 # Configures the endpoint
 config :ttt_server, TttServer.Endpoint,
   url: [host: "localhost"],
-  http: [port: System.get_env("PORT")],
-  secret_key_base: "8cbXwjUoGC9ghA2tLchHjMervDw0cAEyIuit1isSiXE6aBsJncO8XJ2l2G6BIquG",
+  secret_key_base: "tWLYs9dOhV3E9aH1HwVd6BPuD/OHlVNka01c9zO3fWj7jPxV4AmVmgZxvN0/e3t4",
   debug_errors: false
 
 config :phoenix, TttServer.Router,

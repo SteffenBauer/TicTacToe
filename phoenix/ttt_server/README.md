@@ -14,11 +14,12 @@ Start
 After checking out the source code, get dependencies and compile with:
 
 `mix deps.get`
+
 `mix compile`
 
 Then start the web application with:
 
-`mix phoenix.start`
+`mix phoenix.server`
 
 HTTP Get Requests
 -----------------

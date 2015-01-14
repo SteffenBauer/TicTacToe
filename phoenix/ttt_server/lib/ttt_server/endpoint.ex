@@ -21,8 +21,8 @@ defmodule TttServer.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_ttt_server_key",
-    signing_salt: "3gFS79Kf",
-    encryption_salt: "QCt/+ghn"
+    signing_salt: "eYZPGKtp",
+    encryption_salt: "jy44sRP3"
 
   plug :router, TttServer.Router
 end

@@ -12,9 +12,22 @@ use Mix.Config
 # disk for the key and cert.
 
 config :ttt_server, TttServer.Endpoint,
-  url: [host: "example.com"],
-  http: [port: System.get_env("PORT")],
-  secret_key_base: "8cbXwjUoGC9ghA2tLchHjMervDw0cAEyIuit1isSiXE6aBsJncO8XJ2l2G6BIquG"
+#  url: [host: "example.com"],
+  http: [port: System.get_env("PORT") || 4001],
+  secret_key_base: "tWLYs9dOhV3E9aH1HwVd6BPuD/OHlVNka01c9zO3fWj7jPxV4AmVmgZxvN0/e3t4"
 
-config :logger,
-  level: :info
+# Do not pring debug or info messages in production
+config :logger, level: :warn
+
+# ## Using releases
+#
+# If you are doing OTP releases, you need to instruct Phoenix
+# to start the server for all endpoints:
+#
+#     config :phoenix, :serve_endpoints, true
+#
+# Alternatively, you can configure exactly which server to
+# start per endpoint:
+#
+#     config :ttt_server, TttServer.Endpoint, server: true
+#

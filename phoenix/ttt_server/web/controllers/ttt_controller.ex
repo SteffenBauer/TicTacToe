@@ -58,7 +58,6 @@ defmodule TttServer.TTTController do
   end
 
   defp render_msg(conn, param, msg) do
-    IO.inspect msg
     case Map.get param, "FORMAT" do
       "HTML" -> conn |> put_layout(:ttt) |> render("tictactoe.html", message: msg)
       _other -> text conn, msg
