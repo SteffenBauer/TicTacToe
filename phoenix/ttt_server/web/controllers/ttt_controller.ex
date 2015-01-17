@@ -14,6 +14,7 @@ defmodule TttServer.TTTController do
       "DESTROY" -> destroy_session conn, param
       "SHOW"    -> show_field conn, param
       "SET"     -> do_set conn, param
+      "BOARD"   -> show_board conn, param
       nil       -> show_help conn, param
       _other    -> render_msg conn, param, "ERROR: Unknown command"
     end
@@ -43,14 +44,20 @@ defmodule TttServer.TTTController do
 
   defp handle_newboard(conn, param, response) do
     case response do
-      {:invalid, _board}  -> render_msg conn, param, "ERROR: Invalid parameters"
-      {:occupied, _board} -> render_msg conn, param, "ERROR: Field is already occupied"
-      {:ok, board}        -> put_session(conn, :game, board) |> show_field(param)
+      {:gameover, _board}    -> render_msg conn, param, "ERROR: Game over"
+      {:invalid, _board}     -> render_msg conn, param, "ERROR: Invalid parameters"
+      {:occupied, _board}    -> render_msg conn, param, "ERROR: Field is already occupied"
+      {:notyourturn, _board} -> render_msg conn, param, "ERROR: Not your turn"
+      {:ok, board}           -> put_session(conn, :game, board) |> show_board(param)
     end
   end
 
   defp show_field(conn, param) do
-    render_msg conn, param, "FIELD: #{get_session(conn, :game)|> TTTBoard.toString }"
+    render_msg conn, param, "FIELD: " <> (get_session(conn, :game)|> TTTBoard.toString)
+  end
+
+  defp show_board(conn, param) do
+    render_msg conn, param, get_session(conn, :game)|> TTTBoard.toASCII
   end
 
   defp show_help(conn, param) do
