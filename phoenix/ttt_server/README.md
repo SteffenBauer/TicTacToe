@@ -31,8 +31,8 @@ The application understands a number of commands as HTTP Get Requests. Simply us
 * `RESET`: Start new Board
 * `DESTROY`: Start new Session
 * `SHOW`: Show the current Board
+* `BOARD`: Show the board in nice ASCII :-)
 * `SET`: Set a stone to a field given by two additional parameters
-
 * `coordinate`: One of A1, A2, A3, B1, B2, B3, C1, C2, C3
 * `value`: Either x or o
 
