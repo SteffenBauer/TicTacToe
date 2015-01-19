@@ -1,7 +1,42 @@
 defmodule TTTBoard do
 
+  @moduledoc ~S"""
+  TicTacToe board and gameplay functions.
+  
+  This module provides the low-level functions operating on the TicTacToe
+  board data structure.
+    
+  ## Coordinates
+    
+  Game coordinates are formatted as two-character strings, using these
+  positions on the game board:
+
+      +---+---+---+
+      |A1 |B1 |C1 |
+      +---+---+---+
+      |A2 |B2 |C2 |
+      +---+---+---+
+      |A3 |B3 |C3 |
+      +---+---+---+
+    
+  ## Player symbols
+    
+  Players are traditionally `X` and `O`. Player symbols provided to functions
+  are using one-character strings, either "x" or "o".
+    
+  ## Game play
+    
+  Player 'X' always starts the game.
+  """
+
+  @doc ~S"""
+  Returns a new clean TicTacToe board.
+  """
   def new, do: HashDict.new
 
+  @doc ~S"""
+  Returns the board formatted as a string.
+  """
   def toString(nil), do: ""
   def toString(board) do
     board |> HashDict.to_list 
@@ -10,22 +45,19 @@ defmodule TTTBoard do
           |> Enum.join(", ")
   end
 
-# +---+---+---+
-# |A1 |B1 |C1 |
-# +---+---+---+
-# |A2 |B2 |C2 |
-# +---+---+---+
-# |A3 |B3 |C3 |
-# +---+---+---+
+  @header    "    A   B   C  \n"
+  @delimiter "  +---+---+---+\n"
 
-
+  @doc ~S"""
+  Returns the board nicely formatted in ASCII characters.
+  """
   def toASCII(board) do
-    asciiboard = (1..3 |> Enum.reduce delimiter, &(&2 <> row(board, &1) <> "\n" <> delimiter))
+    asciiboard = (1..3 |> Enum.reduce @delimiter, &(&2 <> "#{&1} " <> row(board, &1) <> "\n" <> @delimiter))
     winningplayer = winner(board)
-    if winningplayer != nil do
-      asciiboard <> "\nGame over! Player #{winningplayer} wins"
-    else
-      asciiboard
+    @header <> asciiboard <> cond do
+      winningplayer == :tie      -> "\nGame is a draw."
+      winningplayer in ["x","o"] -> "\nGame over! Player #{winningplayer} wins"
+      true                       -> ""
     end
   end
 
@@ -34,22 +66,58 @@ defmodule TTTBoard do
       Enum.reduce "|", &(&2 <> " " <> HashDict.get(board, "#{&1}#{r}", " ") <> " |")
   end
 
-  defp delimiter do 
-    "+---+---+---+\n"
-  end
-
+  @doc ~S"""
+  Make a game move.
+  
+    * `coor` - Coordinate where to set the move ("A1" .. "C3")
+    * `val` - Symbol to set ("x" or "o")
+    
+  Returns a 2-element tuple `{response, newboard}`. `response` can be one of:
+    * `:ok` - Move was valid
+    * `:invalid` - A completely wrong move was made, either out-of-bounds
+      coordinates or a wrong symbol
+    * `:notyourturn` - Tried a move when it is not the players turn
+    * `:occupied` - Tried to set an already occupied grid space
+    * `:gameover` - Tried to make a move on an already finished game.
+    
+  `newboard` is the new board when the move was valid, or the unmodified board
+  in case of any erroneous move.
+  """
   def setValue(board, coor, val) do
     cond do
+      winner(board) != nil        -> {:gameover, board}
       not valid_coordinate?(coor) -> {:invalid, board}
       not valid_value?(val)       -> {:invalid, board}
       not valid_turn?(board, val) -> {:notyourturn, board}
       is_occupied? board, coor    -> {:occupied, board}
-      winner(board) != nil        -> {:gameover, board}
       true                        -> {:ok, HashDict.put(board, coor, val)}
     end
   end
 
+  @doc ~S"""
+  Returns the current symbol at `coor`, or `:invalid` if the grid cell is
+  unoccupied or the requested coordinate is not valid.
+  """
   def getValue(board, coor), do: HashDict.get(board, coor, :invalid)
+
+  @doc ~S"""
+  Determine whether the board is a winning game, a draw, or still in
+  progress.
+  
+  Returns one of:
+    * `"x"` - Game was won, winner is 'X'.
+    * `"o"` - Game was won, winner is 'O'.
+    * `:tie` - Game is a draw.
+    * `nil` - Game is not decided.
+  """
+  def winner(board) do
+    cond do
+      winner?(board, "x") -> "x"
+      winner?(board, "o") -> "o"
+      (board |> HashDict.size) == 9 -> :tie
+      true -> nil
+    end
+  end
 
   defp is_occupied?(board, coor), do: HashDict.has_key?(board, coor)
 
@@ -68,13 +136,6 @@ defmodule TTTBoard do
     Enum.count(v,&(&1=="x")) - Enum.count(v,&(&1=="o"))
   end
 
-  def winner(board) do
-    cond do
-      winner?(board, "x") -> "x"
-      winner?(board, "o") -> "o"
-      true -> nil
-    end
-  end
   defp winner?(board, player) do
       (~w(1 2 3) |> Enum.map(&(winline?(board, &1, player, :row))) |> Enum.any?) or
       (~w(A B C) |> Enum.map(&(winline?(board, &1, player, :col))) |> Enum.any?) or
